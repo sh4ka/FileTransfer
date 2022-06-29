@@ -13,7 +13,7 @@ class Session
 public:
     using TcpSocket = boost::asio::ip::tcp::socket;
 
-    Session(TcpSocket t_socket);
+    explicit Session(TcpSocket t_socket);
 
     void start()
     {
@@ -26,15 +26,15 @@ private:
     void createFile();
     void readData(std::istream &stream);
     void doReadFileContent(size_t t_bytesTransferred);
-    void handleError(std::string const& t_functionName, boost::system::error_code const& t_ec);
+    static void handleError(std::string const& t_functionName, boost::system::error_code const& t_ec);
 
 
     TcpSocket m_socket;
     enum { MaxLength = 40960 };
-    std::array<char, MaxLength> m_buf;
+    std::array<char, MaxLength> m_buf{};
     boost::asio::streambuf m_requestBuf_;
     std::ofstream m_outputFile;
-    size_t m_fileSize;
+    size_t m_fileSize{};
     std::string m_fileName;
 };
 
@@ -46,7 +46,7 @@ public:
     using TcpAcceptor = boost::asio::ip::tcp::acceptor;
     using IoService = boost::asio::io_service;
 
-    Server(IoService& t_ioService, short t_port, std::string const& t_workDirectory);
+    Server(IoService& t_ioService, short t_port, std::string  t_workDirectory);
 
 private:
     void doAccept();

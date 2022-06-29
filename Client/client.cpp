@@ -3,14 +3,15 @@
 
 #include <boost/filesystem/path.hpp>
 #include <boost/log/trivial.hpp>
+#include <utility>
 
 #include "client.h"
 
 
 Client::Client(IoService& t_ioService, TcpResolverIterator t_endpointIterator, 
-    std::string const& t_path)
+    std::string  t_path)
     : m_ioService(t_ioService), m_socket(t_ioService), 
-    m_endpointIterator(t_endpointIterator), m_path(t_path)
+    m_endpointIterator(std::move(t_endpointIterator)), m_path(std::move(t_path))
 {
     doConnect();
     openFile(m_path);
@@ -23,9 +24,9 @@ void Client::openFile(std::string const& t_path)
     if (m_sourceFile.fail())
         throw std::fstream::failure("Failed while opening file " + t_path);
     
-    m_sourceFile.seekg(0, m_sourceFile.end);
+    m_sourceFile.seekg(0, std::ifstream::end);
     auto fileSize = m_sourceFile.tellg();
-    m_sourceFile.seekg(0, m_sourceFile.beg);
+    m_sourceFile.seekg(0, std::ifstream::beg);
 
     std::ostream requestStream(&m_request);
     boost::filesystem::path p(t_path);
@@ -37,7 +38,7 @@ void Client::openFile(std::string const& t_path)
 void Client::doConnect()
 {
     boost::asio::async_connect(m_socket, m_endpointIterator, 
-        [this](boost::system::error_code ec, TcpResolverIterator)
+        [this](boost::system::error_code ec, const TcpResolverIterator&)
         {
             if (!ec) {
                 writeBuffer(m_request);

@@ -15,7 +15,7 @@ public:
     using TcpSocket = boost::asio::ip::tcp::socket;
 
     Client(IoService& t_ioService, TcpResolverIterator t_endpointIterator, 
-        std::string const& t_path);
+        std::string  t_path);
 
 private:
     void openFile(std::string const& t_path);
@@ -29,7 +29,7 @@ private:
     TcpSocket m_socket;
     TcpResolverIterator m_endpointIterator;
     enum { MessageSize = 1024 };
-    std::array<char, MessageSize> m_buf;
+    std::array<char, MessageSize> m_buf{};
     boost::asio::streambuf m_request;
     std::ifstream m_sourceFile;
     std::string m_path;

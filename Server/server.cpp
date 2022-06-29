@@ -3,6 +3,7 @@
 #include <boost/asio/read_until.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/log/trivial.hpp>
+#include <utility>
 
 #include "server.h"
 
@@ -110,10 +111,10 @@ void Session::handleError(std::string const& t_functionName, boost::system::erro
 }
 
 
-Server::Server(IoService& t_ioService, short t_port, std::string const& t_workDirectory)
+Server::Server(IoService& t_ioService, short t_port, std::string  t_workDirectory)
     : m_socket(t_ioService),
     m_acceptor(t_ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), t_port)),
-    m_workDirectory(t_workDirectory)
+    m_workDirectory(std::move(t_workDirectory))
 {
     std::cout << "Server started\n";
 
